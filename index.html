@@ -6,12 +6,107 @@
     <script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
   <body>
-    <textarea id = "data"></textarea>
-    <textarea id = "endfunction"></textarea>
-    <textarea id = "result"></textarea>
-    <svg>
-      
-      d3.select("#endfunction")[0][0].value = "d3.time.format(%Y)"
+    <select id = "endfunction" name="select">
+      <option value="d3.time.format('%Y')">d3.time.format('%Y')</option> 
+      <option value="getQ">getQ</option>
+      <option value="getDecade">getDecade</option>
+    </select>
+    <textarea id = "result" style="width:500px;" rows=10></textarea>
+    <svg height = "400px" width = "800px">
+      <g id = "chart">
+        <path></path>
+      </g>
     </svg>
+    
+    <script>
+      var data;
+      
+      //set as a starting point
+      d3.select("#endfunction")
+        .on("change",function(){
+          drawChart(updateResult( data ))
+        })[0][0].value = "d3.time.format('%Y')"
+      
+      
+      //update result
+      function updateResult(data){
+        var resultData = getEndPeriod(
+            data, 
+            eval(d3.select("#endfunction")[0][0].value)
+          );
+        d3.select("#result")[0][0].value = JSON.stringify(
+          resultData
+        );
+        return resultData;
+      }
+      
+      //make a simple drawChart for line chart
+      function drawChart( chartData ) {
+        var svg = d3.select("svg");
+        var x = d3.time.scale()
+          .range([0,800 - 50])
+          .domain(d3.extent(chartData, function(d){return d.date}));
+        var y = d3.scale.linear()
+          .range([400 - 100, 0])
+          .domain([0,d3.max(chartData, function(d){return d.sp500})]);
+        var line = d3.svg.line()
+          .x(function(d){
+            return x(d.date)
+          })
+          .y(function(d){
+            return y(d.sp500)
+          })
+          
+        var chart = svg.select("#chart")
+        chart
+          .attr("transform", "translate(" + (50) + "," + (50) + ")")
+        
+        chart.select("path")
+          .datum(chartData)
+          .attr('d', line)
+          .style('fill','none')
+          .style('stroke','black')
+          .style('stroke-width',"1.5px");
+          
+        var xAxis = d3.svg.axis()
+                  .scale(x)
+                  .orient("bottom")
+                  .tickFormat(d3.time.format("%b %Y"))
+                          
+        chart.select("#xaxis")[0][0] ?  chart.select("#xaxis") : chart.append("g")
+          .attr("id","xaxis")
+          .attr("class", "axis")
+          .attr("transform", "translate(0,"  + (400 - 100) + ")")
+          .call(xAxis);
+                    
+        //Define Y axis
+        var yAxis = d3.svg.axis()
+                      .scale(y)
+                      .orient("left")
+                      .ticks(5);
+        
+        //Create Y axis
+        chart.select("#yaxis")[0][0] ?  chart.select("#yaxis") : chart.append("g")
+          .attr("id","yaxis")
+          .attr("class", "axis")
+            //.attr("transform", "translate(" + params.margin.left + "," + params.margin.top + ")")
+          .call(yAxis);
+            
+        //clean up the axes without css stylesheet
+        svg.selectAll(".axis text")
+          .style("font-size","11px")
+        svg.selectAll(".axis path,line")
+          .style("stroke", "#000")
+          .style("fill", "none")
+          .style("shape-rendering" ,"crispEdges")
+
+      }
+      
+      //sample data - s&p500 from St. Louis Federal Reserve FRED
+      d3.json("sp500_fred.json",function(err,jsondata){
+        data = jsondata;
+        drawChart( updateResult(data) );
+      })
+    </script>
   </body>
 </html>
