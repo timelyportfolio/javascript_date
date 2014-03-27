@@ -5,3 +5,5 @@ R package `xts`.  I will admit that I abandoned my search rather quickly, since 
 recreating it would be an interesting challenge.
 
 I'll use this repo as a collection of knowledge, function, and examples for dates in javascript.
+
+![screenshot of example](./screenshot.png)
