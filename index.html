@@ -2,21 +2,32 @@
 <meta charset = 'utf-8'>
 <html>
   <head>
-    <script src = "./endpoints.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src = "./js/endpoints.js"></script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
   <body>
-    <select id = "endfunction" name="select">
-      <option value="d3.time.format('%Y')">d3.time.format('%Y')</option> 
-      <option value="getQ">getQ</option>
-      <option value="getDecade">getDecade</option>
-    </select>
-    <textarea id = "result" style="width:500px;" rows=10></textarea>
-    <svg height = "400px" width = "800px">
-      <g id = "chart">
-        <path></path>
-      </g>
-    </svg>
+    <div class = "container">
+      <div class = "row">
+        <div class = "col-md-3">
+          <select id = "endfunction" name="select">
+            <option value="d3.time.format('%Y')">d3.time.format('%Y')</option> 
+            <option value="getQ">getQ</option>
+            <option value="getDecade">getDecade</option>
+          </select>
+        </div>
+        <div class = "col-md-5">
+          <textarea id = "result" style="width:100%;" rows=10></textarea>
+        </div>
+      </div>
+      <div class = "row">
+        <svg height = "400px" width = "800px">
+          <g id = "chart">
+            <path></path>
+          </g>
+        </svg>
+      </div>
+    </div>
     
     <script>
       var data;
@@ -103,7 +114,7 @@
       }
       
       //sample data - s&p500 from St. Louis Federal Reserve FRED
-      d3.json("sp500_fred.json",function(err,jsondata){
+      d3.json("./data/sp500_fred.json",function(err,jsondata){
         data = jsondata;
         drawChart( updateResult(data) );
       })
